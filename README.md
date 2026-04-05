@@ -1,6 +1,8 @@
-# GitHub KB
+# What if you could ask questions to any GitHub repository? Building a repository-aware AI agent with Python, Strands Agents, and Bedrock
 
-Reading an unfamiliar GitHub repository is one of those tasks that always looks easy until the project is big enough. Before changing a single line of code, we usually need to answer a few basic questions first: is this a REST API, where are the entrypoints, how is the application wired, and are there obvious risks in the codebase? Doing that manually is slow, repetitive, and not especially fun.
+What if you could ask questions to any GitHub repository? Building a repository-aware AI agent with Python, Strands Agents, and Bedrock
+
+Sometimes we land on an unfamiliar GitHub repository and the first problem is not writing code. The real problem is understanding the project fast enough. Is this a REST API? Where are the entrypoints? How is the application wired? Are there obvious risks in the codebase? If the repository is big enough, answering those questions manually is slow and boring.
 
 That is exactly what this PoC does.
 
