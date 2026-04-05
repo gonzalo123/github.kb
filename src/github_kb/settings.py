@@ -78,7 +78,5 @@ def create_boto_session(settings: Settings) -> boto3.Session:
 
     if settings.aws_profile:
         kwargs["profile_name"] = settings.aws_profile
-    if settings.aws_region:
-        kwargs["region_name"] = settings.aws_region
 
     return boto3.Session(**kwargs)
