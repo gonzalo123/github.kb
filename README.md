@@ -1,7 +1,5 @@
 # What if you could ask questions to any GitHub repository? Building a repository-aware AI agent with Python, Strands Agents, and Bedrock
 
-What if you could ask questions to any GitHub repository? Building a repository-aware AI agent with Python, Strands Agents, and Bedrock
-
 Sometimes we land on an unfamiliar GitHub repository and the first problem is not writing code. The real problem is understanding the project fast enough. Is this a REST API? Where are the entrypoints? How is the application wired? Are there obvious risks in the codebase? If the repository is big enough, answering those questions manually is slow and boring.
 
 That's just my PoC. An interactive command-line application that can inspect any public GitHub repository and answer questions about it.
@@ -75,36 +73,22 @@ That sequence maps very well to tool-based agents.
 
 Instead of trying to send the whole repository in one prompt, the model can progressively inspect only the relevant parts. It is cheaper, easier to reason about, and much closer to how we inspect an unknown codebase ourselves.
 
-## Running the PoC
+## Install
 
-This project uses Poetry for local development, but the final goal is to distribute it as a regular CLI.
-
-For local development:
-
-```bash
-poetry install
-cp src/github_kb/env/local/.env.example src/github_kb/env/local/.env
-```
-
-Once published to PyPI, the installation should be as simple as:
+The intended installation flow is:
 
 ```bash
 pipx install github-kb
 ```
 
-The intended happy path is:
+## Quick start
+
+The happy path should look like this:
 
 ```bash
-pipx install github-kb
 aws sso login --profile sandbox
 AWS_PROFILE=sandbox AWS_REGION=us-west-2 github-kb doctor
 AWS_PROFILE=sandbox AWS_REGION=us-west-2 github-kb chat gonzalo123/autofix
-```
-
-And if we want to test the wheel locally:
-
-```bash
-pipx install dist/github_kb-0.1.0-py3-none-any.whl
 ```
 
 The CLI is designed to work out of the box with the standard AWS credential chain. That means it can use:
@@ -116,40 +100,35 @@ The CLI is designed to work out of the box with the standard AWS credential chai
 
 You can also override the runtime explicitly with CLI flags such as `--aws-profile`, `--region`, and `--model`.
 
-For local development, you can still override the Bedrock region and model in `src/github_kb/env/local/.env`:
-
-```dotenv
-AWS_REGION=us-west-2
-BEDROCK_MODEL_ID=us.anthropic.claude-sonnet-4-20250514-v1:0
-```
+## Usage
 
 Now we can ask questions:
 
 ```bash
-poetry run github-kb ask gonzalo123/autofix "How does the automated fix flow work?"
-poetry run github-kb chat gonzalo123/autofix
-poetry run github-kb explain gonzalo123/autofix --topic architecture
-poetry run github-kb audit gonzalo123/autofix --focus github
-poetry run github-kb endpoints gonzalo123/autofix
-poetry run github-kb doctor
+github-kb ask gonzalo123/autofix "How does the automated fix flow work?"
+github-kb chat gonzalo123/autofix
+github-kb explain gonzalo123/autofix --topic architecture
+github-kb audit gonzalo123/autofix --focus github
+github-kb endpoints gonzalo123/autofix
+github-kb doctor
 ```
 
 If we want to keep the same conversation alive across multiple questions in one terminal session:
 
 ```bash
-poetry run github-kb chat gonzalo123/autofix
+github-kb chat gonzalo123/autofix
 ```
 
 It also accepts full GitHub URLs:
 
 ```bash
-poetry run github-kb ask https://github.com/gonzalo123/autofix "Where is the application bootstrapped?"
+github-kb ask https://github.com/gonzalo123/autofix "Where is the application bootstrapped?"
 ```
 
 If we want to refresh the local cache:
 
 ```bash
-poetry run github-kb audit gonzalo123/autofix --refresh
+github-kb audit gonzalo123/autofix --refresh
 ```
 
 We can also pass the AWS runtime explicitly:
@@ -158,6 +137,27 @@ We can also pass the AWS runtime explicitly:
 github-kb chat gonzalo123/autofix --aws-profile sandbox --region us-west-2
 github-kb ask gonzalo123/autofix "Explain the architecture" --model us.anthropic.claude-sonnet-4-20250514-v1:0
 ```
+
+## Development
+
+For local development:
+
+```bash
+poetry install
+cp src/github_kb/env/local/.env.example src/github_kb/env/local/.env
+poetry run pytest -q
+poetry run github-kb --help
+```
+
+For local packaging tests:
+
+```bash
+poetry build
+pipx install --force dist/github_kb-0.1.0-py3-none-any.whl
+github-kb --help
+```
+
+For publishing, see [RELEASING.md](RELEASING.md).
 
 ## Demo screenshots
 

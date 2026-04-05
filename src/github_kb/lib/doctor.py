@@ -93,9 +93,8 @@ def check_aws(settings: Settings) -> list[DiagnosticResult]:
         return results
 
     try:
-        session.client("bedrock", region_name=settings.aws_region).get_foundation_model(
-            modelIdentifier=settings.bedrock_model_id
-        )
+        bedrock_client = session.client("bedrock", region_name=settings.aws_region)
+        validate_bedrock_model(bedrock_client, settings.bedrock_model_id)
         results.append(
             DiagnosticResult(
                 name="bedrock",
@@ -113,3 +112,16 @@ def check_aws(settings: Settings) -> list[DiagnosticResult]:
         )
 
     return results
+
+
+def validate_bedrock_model(bedrock_client, model_id: str) -> None:
+    if looks_like_inference_profile(model_id):
+        bedrock_client.get_inference_profile(inferenceProfileIdentifier=model_id)
+        return
+
+    bedrock_client.get_foundation_model(modelIdentifier=model_id)
+
+
+def looks_like_inference_profile(model_id: str) -> bool:
+    prefixes = ("us.", "eu.", "apac.", "global.")
+    return model_id.startswith(prefixes)

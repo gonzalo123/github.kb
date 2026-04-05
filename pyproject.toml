@@ -1,9 +1,29 @@
 [tool.poetry]
 name = "github-kb"
-version = "0.1.0"
+version = "0.1.2"
 description = "Ask questions about a GitHub repository with Strands Agents and AWS Bedrock"
+license = "MIT"
 authors = ["Gonzalo Ayuso <gonzalo123@gmail.com>"]
 readme = "README.md"
+homepage = "https://github.com/gonzalo123/github.kb"
+repository = "https://github.com/gonzalo123/github.kb"
+documentation = "https://github.com/gonzalo123/github.kb#readme"
+keywords = ["github", "ai", "agents", "bedrock", "cli", "developer-tools"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Quality Assurance",
+]
 packages = [{include = "github_kb", from = "src"}]
 
 [tool.poetry.dependencies]
