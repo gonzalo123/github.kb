@@ -4,7 +4,9 @@ What if you could ask questions to any GitHub repository? Building a repository-
 
 Sometimes we land on an unfamiliar GitHub repository and the first problem is not writing code. The real problem is understanding the project fast enough. Is this a REST API? Where are the entrypoints? How is the application wired? Are there obvious risks in the codebase? If the repository is big enough, answering those questions manually is slow and boring.
 
-That is exactly what this PoC does.
+That's just my PoC. An interactive command-line application that can inspect any public GitHub repository and answer questions about it.
+
+![logo](assets/logo.png)
 
 The idea is simple. We give a GitHub repository to a CLI application. The CLI creates a local checkout, exposes a small set of repository-aware tools to a Strands Agent, and lets the agent inspect the project with AWS Bedrock. Because the agent can list directories, search code and read files, we can ask practical questions such as:
 
