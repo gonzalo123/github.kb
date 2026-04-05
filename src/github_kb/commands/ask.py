@@ -1,6 +1,6 @@
 import click
 
-from github_kb.commands.common import join_parts, run_prompt
+from github_kb.commands.common import join_parts, run_prompt, runtime_options
 
 
 @click.command(name="ask")
@@ -8,11 +8,15 @@ from github_kb.commands.common import join_parts, run_prompt
 @click.argument("question", nargs=-1, required=True)
 @click.option("--ref", default=None, help="Git branch, tag or commit to inspect.")
 @click.option("--refresh", is_flag=True, help="Refresh the cached local checkout.")
+@runtime_options
 def ask_command(
     repository: str,
     question: tuple[str, ...],
     ref: str | None,
     refresh: bool,
+    aws_profile: str | None,
+    region: str | None,
+    model: str | None,
 ) -> None:
     """Ask an open question about a GitHub repository."""
 
@@ -22,4 +26,7 @@ def ask_command(
         title="Answer",
         ref=ref,
         refresh=refresh,
+        aws_profile=aws_profile,
+        region=region,
+        model=model,
     )

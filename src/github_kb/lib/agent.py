@@ -1,14 +1,18 @@
+from boto3.session import Session
 from strands import Agent, tool
 from strands.models import BedrockModel
 
 from github_kb.lib.prompts import SYSTEM_PROMPT
 from github_kb.lib.repository import RepositoryExplorer
-from github_kb.settings import Settings
+from github_kb.settings import Settings, create_boto_session
 
 
 def create_agent(explorer: RepositoryExplorer, *, settings: Settings) -> Agent:
+    boto_session: Session = create_boto_session(settings)
+
     return Agent(
         model=BedrockModel(
+            boto_session=boto_session,
             model_id=settings.bedrock_model_id,
             region_name=settings.aws_region,
         ),

@@ -92,13 +92,31 @@ Once published to PyPI, the installation should be as simple as:
 pipx install github-kb
 ```
 
+The intended happy path is:
+
+```bash
+pipx install github-kb
+aws sso login --profile sandbox
+AWS_PROFILE=sandbox AWS_REGION=us-west-2 github-kb doctor
+AWS_PROFILE=sandbox AWS_REGION=us-west-2 github-kb chat gonzalo123/autofix
+```
+
 And if we want to test the wheel locally:
 
 ```bash
 pipx install dist/github_kb-0.1.0-py3-none-any.whl
 ```
 
-The default configuration expects AWS credentials to be available in the environment or in your local AWS profile. You can override the Bedrock region and model in `src/github_kb/env/local/.env`:
+The CLI is designed to work out of the box with the standard AWS credential chain. That means it can use:
+
+- `AWS_PROFILE`
+- `AWS_REGION`
+- `aws sso login`
+- regular access keys if they are already configured in the environment
+
+You can also override the runtime explicitly with CLI flags such as `--aws-profile`, `--region`, and `--model`.
+
+For local development, you can still override the Bedrock region and model in `src/github_kb/env/local/.env`:
 
 ```dotenv
 AWS_REGION=us-west-2
@@ -113,6 +131,7 @@ poetry run github-kb chat gonzalo123/autofix
 poetry run github-kb explain gonzalo123/autofix --topic architecture
 poetry run github-kb audit gonzalo123/autofix --focus github
 poetry run github-kb endpoints gonzalo123/autofix
+poetry run github-kb doctor
 ```
 
 If we want to keep the same conversation alive across multiple questions in one terminal session:
@@ -131,6 +150,13 @@ If we want to refresh the local cache:
 
 ```bash
 poetry run github-kb audit gonzalo123/autofix --refresh
+```
+
+We can also pass the AWS runtime explicitly:
+
+```bash
+github-kb chat gonzalo123/autofix --aws-profile sandbox --region us-west-2
+github-kb ask gonzalo123/autofix "Explain the architecture" --model us.anthropic.claude-sonnet-4-20250514-v1:0
 ```
 
 ## Demo screenshots

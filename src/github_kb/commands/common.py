@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from functools import wraps
 
 import click
 from strands import Agent
@@ -8,7 +9,30 @@ from github_kb.lib.github import ensure_repository, parse_repository
 from github_kb.lib.models import RepositoryContext
 from github_kb.lib.repository import RepositoryExplorer
 from github_kb.lib.ui import get_console, print_repository_panel, print_result
-from github_kb.settings import get_settings
+from github_kb.settings import resolve_settings
+
+
+def runtime_options(function):
+    @click.option(
+        "--aws-profile",
+        default=None,
+        help="AWS profile name to use. Falls back to AWS_PROFILE if unset.",
+    )
+    @click.option(
+        "--region",
+        default=None,
+        help="AWS region for Bedrock. Falls back to AWS_REGION if unset.",
+    )
+    @click.option(
+        "--model",
+        default=None,
+        help="Bedrock model id. Falls back to BEDROCK_MODEL_ID if unset.",
+    )
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        return function(*args, **kwargs)
+
+    return wrapper
 
 
 def join_parts(parts: Sequence[str]) -> str:
@@ -22,11 +46,17 @@ def run_prompt(
     title: str,
     ref: str | None = None,
     refresh: bool = False,
+    aws_profile: str | None = None,
+    region: str | None = None,
+    model: str | None = None,
 ) -> None:
     repository_context, agent = prepare_agent(
         repository,
         ref=ref,
         refresh=refresh,
+        aws_profile=aws_profile,
+        region=region,
+        model=model,
     )
     print_repository_panel(repository_context)
 
@@ -45,8 +75,15 @@ def prepare_agent(
     *,
     ref: str | None = None,
     refresh: bool = False,
+    aws_profile: str | None = None,
+    region: str | None = None,
+    model: str | None = None,
 ) -> tuple[RepositoryContext, Agent]:
-    settings = get_settings()
+    settings = resolve_settings(
+        aws_profile=aws_profile,
+        aws_region=region,
+        bedrock_model_id=model,
+    )
     console = get_console()
 
     try:

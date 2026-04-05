@@ -2,6 +2,7 @@ import os
 from functools import lru_cache
 from pathlib import Path
 
+import boto3
 from dotenv import load_dotenv
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -14,6 +15,10 @@ load_dotenv(dotenv_path=ENV_FILE)
 
 
 class Settings(BaseSettings):
+    aws_profile: str | None = Field(
+        default=None,
+        validation_alias="AWS_PROFILE",
+    )
     aws_region: str = Field(
         default="us-west-2",
         validation_alias="AWS_REGION",
@@ -44,3 +49,36 @@ class Settings(BaseSettings):
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     return Settings()
+
+
+def resolve_settings(
+    *,
+    aws_profile: str | None = None,
+    aws_region: str | None = None,
+    bedrock_model_id: str | None = None,
+) -> Settings:
+    settings = get_settings()
+    updates: dict[str, str | None] = {}
+
+    if aws_profile:
+        updates["aws_profile"] = aws_profile
+    if aws_region:
+        updates["aws_region"] = aws_region
+    if bedrock_model_id:
+        updates["bedrock_model_id"] = bedrock_model_id
+
+    if not updates:
+        return settings
+
+    return settings.model_copy(update=updates)
+
+
+def create_boto_session(settings: Settings) -> boto3.Session:
+    kwargs: dict[str, str] = {}
+
+    if settings.aws_profile:
+        kwargs["profile_name"] = settings.aws_profile
+    if settings.aws_region:
+        kwargs["region_name"] = settings.aws_region
+
+    return boto3.Session(**kwargs)
