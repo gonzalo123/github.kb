@@ -2,6 +2,7 @@
 
 .cache/
 .coverage
+dist/
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
@@ -19,3 +20,4 @@ venv/
 .vscode/
 
 src/env/*/.env
+src/github_kb/env/*/.env

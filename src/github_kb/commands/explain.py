@@ -1,7 +1,7 @@
 import click
 
-from commands.common import run_prompt
-from lib.prompts import build_explain_prompt
+from github_kb.commands.common import run_prompt
+from github_kb.lib.prompts import build_explain_prompt
 
 
 @click.command(name="explain")

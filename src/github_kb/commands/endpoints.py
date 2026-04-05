@@ -1,26 +1,24 @@
 import click
 
-from commands.common import run_prompt
-from lib.prompts import build_audit_prompt
+from github_kb.commands.common import run_prompt
+from github_kb.lib.prompts import build_endpoints_prompt
 
 
-@click.command(name="audit")
+@click.command(name="endpoints")
 @click.argument("repository")
-@click.option("--focus", default=None, help="Optional area to focus the audit on.")
 @click.option("--ref", default=None, help="Git branch, tag or commit to inspect.")
 @click.option("--refresh", is_flag=True, help="Refresh the cached local checkout.")
-def audit_command(
+def endpoints_command(
     repository: str,
-    focus: str | None,
     ref: str | None,
     refresh: bool,
 ) -> None:
-    """Run a code audit against the repository."""
+    """List the API endpoints found in the repository."""
 
     run_prompt(
         repository,
-        build_audit_prompt(focus=focus),
-        title="Audit",
+        build_endpoints_prompt(),
+        title="Endpoints",
         ref=ref,
         refresh=refresh,
     )

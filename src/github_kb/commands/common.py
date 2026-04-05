@@ -1,12 +1,14 @@
 from collections.abc import Sequence
 
 import click
+from strands import Agent
 
-from lib.agent import create_agent
-from lib.github import ensure_repository, parse_repository
-from lib.repository import RepositoryExplorer
-from lib.ui import get_console, print_repository_panel, print_result
-from settings import get_settings
+from github_kb.lib.agent import create_agent
+from github_kb.lib.github import ensure_repository, parse_repository
+from github_kb.lib.models import RepositoryContext
+from github_kb.lib.repository import RepositoryExplorer
+from github_kb.lib.ui import get_console, print_repository_panel, print_result
+from github_kb.settings import get_settings
 
 
 def join_parts(parts: Sequence[str]) -> str:
@@ -21,6 +23,29 @@ def run_prompt(
     ref: str | None = None,
     refresh: bool = False,
 ) -> None:
+    repository_context, agent = prepare_agent(
+        repository,
+        ref=ref,
+        refresh=refresh,
+    )
+    print_repository_panel(repository_context)
+
+    console = get_console()
+    try:
+        with console.status("Thinking with Bedrock...", spinner="dots"):
+            result = agent(prompt)
+    except Exception as error:
+        raise click.ClickException(str(error)) from error
+
+    print_result(title, str(result))
+
+
+def prepare_agent(
+    repository: str,
+    *,
+    ref: str | None = None,
+    refresh: bool = False,
+) -> tuple[RepositoryContext, Agent]:
     settings = get_settings()
     console = get_console()
 
@@ -40,13 +65,8 @@ def run_prompt(
                 root_path=repository_context.local_path,
                 settings=settings,
             )
-
-        print_repository_panel(repository_context)
-
-        with console.status("Thinking with Bedrock...", spinner="dots"):
             agent = create_agent(explorer, settings=settings)
-            result = agent(prompt)
     except Exception as error:
         raise click.ClickException(str(error)) from error
 
-    print_result(title, str(result))
+    return repository_context, agent

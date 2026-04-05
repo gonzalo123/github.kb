@@ -4,10 +4,10 @@ version = "0.1.0"
 description = "Ask questions about a GitHub repository with Strands Agents and AWS Bedrock"
 authors = ["Gonzalo Ayuso <gonzalo123@gmail.com>"]
 readme = "README.md"
-package-mode = false
+packages = [{include = "github_kb", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.13"
+python = ">=3.11,<4.0"
 boto3 = "^1.42.78"
 click = "^8.3.1"
 pydantic = "^2.12.3"
@@ -18,6 +18,9 @@ strands-agents = "^1.34.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.2"
+
+[tool.poetry.scripts]
+github-kb = "github_kb.cli:cli"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

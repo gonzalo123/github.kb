@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from lib.repository import RepositoryExplorer
-from settings import Settings
+from github_kb.lib.repository import RepositoryExplorer
+from github_kb.settings import Settings
 
 
 def build_explorer(tmp_path: Path) -> RepositoryExplorer:

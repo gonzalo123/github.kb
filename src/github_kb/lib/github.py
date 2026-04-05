@@ -2,8 +2,8 @@ from pathlib import Path
 import subprocess
 from urllib.parse import urlparse
 
-from lib.models import GitHubRepositoryReference, RepositoryContext
-from settings import Settings
+from github_kb.lib.models import GitHubRepositoryReference, RepositoryContext
+from github_kb.settings import Settings
 
 VALID_GITHUB_HOSTS = {"github.com", "www.github.com"}
 

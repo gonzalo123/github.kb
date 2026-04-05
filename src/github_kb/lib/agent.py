@@ -1,9 +1,9 @@
 from strands import Agent, tool
 from strands.models import BedrockModel
 
-from lib.prompts import SYSTEM_PROMPT
-from lib.repository import RepositoryExplorer
-from settings import Settings
+from github_kb.lib.prompts import SYSTEM_PROMPT
+from github_kb.lib.repository import RepositoryExplorer
+from github_kb.settings import Settings
 
 
 def create_agent(explorer: RepositoryExplorer, *, settings: Settings) -> Agent:

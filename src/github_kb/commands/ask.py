@@ -1,24 +1,25 @@
 import click
 
-from commands.common import run_prompt
-from lib.prompts import build_endpoints_prompt
+from github_kb.commands.common import join_parts, run_prompt
 
 
-@click.command(name="endpoints")
+@click.command(name="ask")
 @click.argument("repository")
+@click.argument("question", nargs=-1, required=True)
 @click.option("--ref", default=None, help="Git branch, tag or commit to inspect.")
 @click.option("--refresh", is_flag=True, help="Refresh the cached local checkout.")
-def endpoints_command(
+def ask_command(
     repository: str,
+    question: tuple[str, ...],
     ref: str | None,
     refresh: bool,
 ) -> None:
-    """List the API endpoints found in the repository."""
+    """Ask an open question about a GitHub repository."""
 
     run_prompt(
         repository,
-        build_endpoints_prompt(),
-        title="Endpoints",
+        join_parts(question),
+        title="Answer",
         ref=ref,
         refresh=refresh,
     )

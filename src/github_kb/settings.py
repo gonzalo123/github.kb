@@ -23,7 +23,7 @@ class Settings(BaseSettings):
         validation_alias="BEDROCK_MODEL_ID",
     )
     repo_cache_path: Path = Field(
-        default=BASE_DIR.parent / ".cache" / "repos",
+        default=Path.home() / ".cache" / "github-kb" / "repos",
         validation_alias="REPO_CACHE_PATH",
     )
     tree_max_depth: int = Field(default=4, validation_alias="TREE_MAX_DEPTH")

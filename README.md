@@ -8,6 +8,8 @@ That's just my PoC. An interactive command-line application that can inspect any
 
 ![logo](assets/logo.png)
 
+I have the feeling this workflow should exist natively on GitHub. Once repositories become large enough, being able to ask architecture, audit, or API questions feels like a natural evolution of code search and Copilot. Maybe the reason it does not exist yet is cost, scope, or product complexity. In the meantime, a CLI-first open source approach feels like a good place to start: simple, scriptable, hackable, and based on bring-your-own-model credentials so each user keeps control of their own usage and billing.
+
 The idea is simple. We give a GitHub repository to a CLI application. The CLI creates a local checkout, exposes a small set of repository-aware tools to a Strands Agent, and lets the agent inspect the project with AWS Bedrock. Because the agent can list directories, search code and read files, we can ask practical questions such as:
 
 - Explain how the project works
@@ -36,32 +38,34 @@ I like to keep configuration in `settings.py`. It is a pattern I borrowed years 
 
 ```text
 src/
-├── cli.py
-├── settings.py
-├── commands/
-│   ├── ask.py
-│   ├── audit.py
-│   ├── endpoints.py
-│   └── explain.py
-├── lib/
-│   ├── agent.py
-│   ├── github.py
-│   ├── models.py
-│   ├── prompts.py
-│   ├── repository.py
-│   └── ui.py
-└── env/
-    └── local/
-        └── .env.example
+└── github_kb/
+    ├── cli.py
+    ├── settings.py
+    ├── commands/
+    │   ├── ask.py
+    │   ├── audit.py
+    │   ├── chat.py
+    │   ├── endpoints.py
+    │   └── explain.py
+    ├── lib/
+    │   ├── agent.py
+    │   ├── github.py
+    │   ├── models.py
+    │   ├── prompts.py
+    │   ├── repository.py
+    │   └── ui.py
+    └── env/
+        └── local/
+            └── .env.example
 ```
 
 The responsibilities are small and explicit:
 
-- `commands/` contains the Click commands.
-- `lib/github.py` resolves the GitHub repository and manages the local checkout.
-- `lib/repository.py` contains the repository exploration logic used by the agent tools.
-- `lib/agent.py` wires Strands Agents with AWS Bedrock.
-- `lib/prompts.py` keeps the system prompt and the task-specific prompts in one place.
+- `github_kb/commands/` contains the Click commands.
+- `github_kb/lib/github.py` resolves the GitHub repository and manages the local checkout.
+- `github_kb/lib/repository.py` contains the repository exploration logic used by the agent tools.
+- `github_kb/lib/agent.py` wires Strands Agents with AWS Bedrock.
+- `github_kb/lib/prompts.py` keeps the system prompt and the task-specific prompts in one place.
 
 ## Why this works
 
@@ -73,14 +77,28 @@ Instead of trying to send the whole repository in one prompt, the model can prog
 
 ## Running the PoC
 
-This project uses Poetry for dependency management.
+This project uses Poetry for local development, but the final goal is to distribute it as a regular CLI.
+
+For local development:
 
 ```bash
 poetry install
-cp src/env/local/.env.example src/env/local/.env
+cp src/github_kb/env/local/.env.example src/github_kb/env/local/.env
 ```
 
-The default configuration expects AWS credentials to be available in the environment or in your local AWS profile. You can override the Bedrock region and model in `src/env/local/.env`:
+Once published to PyPI, the installation should be as simple as:
+
+```bash
+pipx install github-kb
+```
+
+And if we want to test the wheel locally:
+
+```bash
+pipx install dist/github_kb-0.1.0-py3-none-any.whl
+```
+
+The default configuration expects AWS credentials to be available in the environment or in your local AWS profile. You can override the Bedrock region and model in `src/github_kb/env/local/.env`:
 
 ```dotenv
 AWS_REGION=us-west-2
@@ -90,22 +108,29 @@ BEDROCK_MODEL_ID=us.anthropic.claude-sonnet-4-20250514-v1:0
 Now we can ask questions:
 
 ```bash
-poetry run python src/cli.py ask gonzalo123/autofix "How does the automated fix flow work?"
-poetry run python src/cli.py explain gonzalo123/autofix --topic architecture
-poetry run python src/cli.py audit gonzalo123/autofix --focus github
-poetry run python src/cli.py endpoints gonzalo123/autofix
+poetry run github-kb ask gonzalo123/autofix "How does the automated fix flow work?"
+poetry run github-kb chat gonzalo123/autofix
+poetry run github-kb explain gonzalo123/autofix --topic architecture
+poetry run github-kb audit gonzalo123/autofix --focus github
+poetry run github-kb endpoints gonzalo123/autofix
+```
+
+If we want to keep the same conversation alive across multiple questions in one terminal session:
+
+```bash
+poetry run github-kb chat gonzalo123/autofix
 ```
 
 It also accepts full GitHub URLs:
 
 ```bash
-poetry run python src/cli.py ask https://github.com/gonzalo123/autofix "Where is the application bootstrapped?"
+poetry run github-kb ask https://github.com/gonzalo123/autofix "Where is the application bootstrapped?"
 ```
 
 If we want to refresh the local cache:
 
 ```bash
-poetry run python src/cli.py audit gonzalo123/autofix --refresh
+poetry run github-kb audit gonzalo123/autofix --refresh
 ```
 
 ## Demo screenshots

@@ -1,6 +1,6 @@
 import pytest
 
-from lib.github import parse_repository
+from github_kb.lib.github import parse_repository
 
 
 def test_parse_owner_and_repository() -> None:

@@ -3,7 +3,7 @@ from rich.markdown import Markdown
 from rich.panel import Panel
 from rich.table import Table
 
-from lib.models import RepositoryContext
+from github_kb.lib.models import RepositoryContext
 
 console = Console()
 

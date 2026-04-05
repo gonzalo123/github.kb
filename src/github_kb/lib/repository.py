@@ -4,7 +4,7 @@ import subprocess
 
 from pydantic import BaseModel, ConfigDict
 
-from settings import Settings
+from github_kb.settings import Settings
 
 IGNORED_DIRECTORIES = {
     ".git",
