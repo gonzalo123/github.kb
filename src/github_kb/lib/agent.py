@@ -13,8 +13,7 @@ def create_agent(explorer: RepositoryExplorer, *, settings: Settings) -> Agent:
     return Agent(
         model=BedrockModel(
             boto_session=boto_session,
-            model_id=settings.bedrock_model_id,
-            region_name=settings.aws_region,
+            model_id=settings.resolved_bedrock_model_id,
         ),
         tools=create_tools(explorer),
         system_prompt=SYSTEM_PROMPT,

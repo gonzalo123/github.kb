@@ -23,8 +23,8 @@ class Settings(BaseSettings):
         default="us-west-2",
         validation_alias="AWS_REGION",
     )
-    bedrock_model_id: str = Field(
-        default="us.anthropic.claude-sonnet-4-20250514-v1:0",
+    bedrock_model_id: str | None = Field(
+        default=None,
         validation_alias="BEDROCK_MODEL_ID",
     )
     repo_cache_path: Path = Field(
@@ -44,6 +44,13 @@ class Settings(BaseSettings):
         extra="ignore",
         populate_by_name=True,
     )
+
+    @property
+    def resolved_bedrock_model_id(self) -> str:
+        if self.bedrock_model_id:
+            return self.bedrock_model_id
+
+        return default_bedrock_model_id(self.aws_region)
 
 
 @lru_cache(maxsize=1)
@@ -78,5 +85,11 @@ def create_boto_session(settings: Settings) -> boto3.Session:
 
     if settings.aws_profile:
         kwargs["profile_name"] = settings.aws_profile
+    if settings.aws_region:
+        kwargs["region_name"] = settings.aws_region
 
     return boto3.Session(**kwargs)
+
+
+def default_bedrock_model_id(region: str) -> str:
+    return "global.anthropic.claude-sonnet-4-6"

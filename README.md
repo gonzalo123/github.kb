@@ -98,6 +98,8 @@ The CLI is designed to work out of the box with the standard AWS credential chai
 - `aws sso login`
 - regular access keys if they are already configured in the environment
 
+By default, `github-kb` uses `global.anthropic.claude-sonnet-4-6` unless `BEDROCK_MODEL_ID` or `--model` says otherwise.
+
 You can also override the runtime explicitly with CLI flags such as `--aws-profile`, `--region`, and `--model`.
 
 ## Usage
@@ -134,30 +136,9 @@ github-kb audit gonzalo123/autofix --refresh
 We can also pass the AWS runtime explicitly:
 
 ```bash
-github-kb chat gonzalo123/autofix --aws-profile sandbox --region us-west-2
-github-kb ask gonzalo123/autofix "Explain the architecture" --model us.anthropic.claude-sonnet-4-20250514-v1:0
+github-kb chat gonzalo123/autofix --aws-profile sandbox --region eu-central-1
+github-kb ask gonzalo123/autofix "Explain the architecture" --model global.anthropic.claude-sonnet-4-6
 ```
-
-## Development
-
-For local development:
-
-```bash
-poetry install
-cp src/github_kb/env/local/.env.example src/github_kb/env/local/.env
-poetry run pytest -q
-poetry run github-kb --help
-```
-
-For local packaging tests:
-
-```bash
-poetry build
-pipx install --force dist/github_kb-0.1.0-py3-none-any.whl
-github-kb --help
-```
-
-For publishing, see [RELEASING.md](RELEASING.md).
 
 ## Demo screenshots
 

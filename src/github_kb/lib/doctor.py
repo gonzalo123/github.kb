@@ -94,12 +94,13 @@ def check_aws(settings: Settings) -> list[DiagnosticResult]:
 
     try:
         bedrock_client = session.client("bedrock", region_name=settings.aws_region)
-        validate_bedrock_model(bedrock_client, settings.bedrock_model_id)
+        model_id = settings.resolved_bedrock_model_id
+        validate_bedrock_model(bedrock_client, model_id)
         results.append(
             DiagnosticResult(
                 name="bedrock",
                 ok=True,
-                message=f"Model available: {settings.bedrock_model_id} in {settings.aws_region}",
+                message=f"Model available: {model_id} in {settings.aws_region}",
             )
         )
     except (BotoCoreError, ClientError) as error:
@@ -107,7 +108,7 @@ def check_aws(settings: Settings) -> list[DiagnosticResult]:
             DiagnosticResult(
                 name="bedrock",
                 ok=False,
-                message=f"Unable to validate model {settings.bedrock_model_id}: {error}",
+                message=f"Unable to validate model {settings.resolved_bedrock_model_id}: {error}",
             )
         )
 
